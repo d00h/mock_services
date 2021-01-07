@@ -1,0 +1,16 @@
+- endpoint: easysms.send_sms
+  body_template: timeout from easysms
+  step: 0
+  chance: 50
+  status: 504
+
+- endpoint: easysms.send_sms
+  content_type: application/json
+  body_template: |
+      {
+          "message": "sended",
+          "sms_id": "{{ email() }}"
+      }
+  step: 0
+  chance: 50
+  status: 200

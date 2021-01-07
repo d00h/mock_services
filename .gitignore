@@ -1,0 +1,12 @@
+# python
+.pytest_cache/
+__pycache__/
+*.py[cod]
+
+# editors
+.undodir/
+Session.vim
+.vimrc
+*.sublime-workspace
+*.sublime-project
+idea/

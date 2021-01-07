@@ -1,0 +1,19 @@
+- endpoint: easysms.send_sms
+  content_type: application/json
+  body_template: |
+      {
+          "message": "sended",
+          "sms_id": "1"
+      }
+  step: 0
+  status: 200
+
+- endpoint: easysms.send_sms
+  content_type: application/json
+  body_template: |
+      {
+          "message": "sended",
+          "sms_id": "2"
+      }
+  step: 1
+  status: 200
