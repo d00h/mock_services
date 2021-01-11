@@ -94,7 +94,7 @@ def stats(profile, **kwargs):
     tags: [ service/mailgun ]
     description: |
        https://documentation.mailgun.com/en/latest/api-stats.html#stats
-       
+
        BUG: попробывать не работает из-за ограничений передачи параметров swagger-ui в GET
 
        сгенеренный curl работает нормально
