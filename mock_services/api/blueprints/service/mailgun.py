@@ -1,13 +1,14 @@
 from datetime import datetime
 
-from covador import opt, split
+from covador import args, opt, split
 from covador.flask import form
-from flask import Blueprint, jsonify
+from flask import Blueprint, current_app, jsonify, request
 
 mailgun = Blueprint("mailgun", __name__)
 
 
-@mailgun.route('/messages', methods=['POST'])
+@mailgun.route('/{profile}/messages', methods=['POST'])
+@args(profile=str)
 @form(**{
     'from': str,
     'to': split(str),
@@ -17,6 +18,10 @@ mailgun = Blueprint("mailgun", __name__)
     'o:testmode': opt(str),
 })
 def messages(profile, **kwargs):
+    response = current_app.get_fake_response(
+        profile=profile, endpoint=request.endpoint, **kwargs)
+    if response is not None:
+        return response
     now = datetime.now()
     return jsonify(
         id='<{0:%Y%m%d%H%M%S}.{1}@mailgun.org>'.format(now, now.timestamp()),
@@ -24,8 +29,14 @@ def messages(profile, **kwargs):
     )
 
 
-@mailgun.route('/stats/total', methods=['GET'])
+@mailgun.route('/{profile}/stats/total', methods=['GET'])
+@args(profile=str)
 def stats(profile, **kwargs):
+    response = current_app.get_fake_response(
+        profile=profile, endpoint=request.endpoint, **kwargs)
+    if response is not None:
+        return response
+
     return jsonify(
         {
             "end": "Fri, 01 Apr 2012 00:00:00 UTC",
