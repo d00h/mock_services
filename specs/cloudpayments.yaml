@@ -13,7 +13,7 @@ tags:
 paths:
     payments/cards/auth:
         post:
-            operationId: cloudpauments.payments_cards_auth
+            operationId: cloudpayments.payments_cards_auth
             summary: Авторизировать платеж (заморозить средства на карте).
             externalDocs:
                 url: https://developers.cloudpayments.ru/#oplata-po-kriptogramme
@@ -29,7 +29,7 @@ paths:
 
     payments/void:
         post:
-            operationId: cloudpauments.payments_void
+            operationId: cloudpayments.payments_void
             summary: Отменить авторизированный платеж.
             externalDocs:
                 url: https://developers.cloudpayments.ru/#otmena-oplaty
@@ -37,7 +37,7 @@ paths:
 
     payments/tokens/charge:
         post:
-            operationId: cloudpauments.payments_tokens_charge
+            operationId: cloudpayments.payments_tokens_charge
             summary: Выполнить рекуррентный платеж по токену
             externalDocs:
                 url: https://developers.cloudpayments.ru/#oplata-po-tokenu-rekarring
@@ -45,7 +45,7 @@ paths:
 
     payments/cards/post3ds:
         post:
-            operationId: cloudpauments.payment_cards_post3ds
+            operationId: cloudpayments.payment_cards_post3ds
             summary: Для завершения оплаты выполните следующий метод Post3ds.
             externalDocs:
                 url: https://developers.cloudpayments.ru/#obrabotka-3-d-secure
@@ -67,7 +67,7 @@ paths:
 
     payments/find:
         post:
-            operationId: cloudpauments.payments_find
+            operationId: cloudpayments.payments_find
             summary: Проверка статуса платежа
             externalDocs:
                 url: https://developers.cloudpayments.ru/#proverka-statusa-platezha
