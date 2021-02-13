@@ -63,7 +63,51 @@ EASYSMS_URL=http://mock_services.develop/service/easysms/easysms_weak
 * /service/easysms/profile/ точка для замены сервиса
 * /profile/название управления профилями (планируется)
 
-# genarate-service-stub
+# Профиль
+
+это файл содержаций список ответов сервисов
+
+```yaml
+
+- endpoint: easysms.send_sms
+  content_type: application/json
+  body_template: |
+      {
+          "message": "sended",
+          "sms_id": "1"
+      }
+  step: 0
+  change: 50
+  status: 200
+
+- endpoint: easysms.send_sms
+  content_type: application/json
+  body_template: |
+      {
+          "message": "sended",
+          "sms_id": "2"
+      }
+  step: 0
+  change: 50
+  status: 200
+
+- endpoint: easysms.send_sms
+  content_type: application/json
+  body_template: |
+      {
+          "message": "sended",
+          "sms_id": "3"
+      }
+  step: 1
+  status: 200
+```
+
+описывает последовательность вызовов сервиса easysms
+
+1 вызов с вероятностью 50/50 либо sms_id = 1 либо sms_id = 2
+2 вызов sms_id = 3
+
+# generate-service-stub
 
 простая и грязная утилита генерирует начальный файл для сервиса из swagger spec
 
@@ -76,3 +120,25 @@ python tools/generate-service-stub.py spec/easysms.yaml
 
 чисто теоретически возможно генерировать более полную версию исходника или делать это прям на лету
 , но на первом этапе этого достаточно.
+
+
+# точки расширения
+
+1. сделать /profile/название
+
+get: получить текуший профиль
+put: записать новый профиль
+delete: удалить
+
+нужно для создания временных профилей и чтобы можно было бы асинхроноо использовать один сервер в многопоточной среде
+
+2. сделать /logs/название
+
+get: получить список вызовов endpoint 
+по сути сниффер, можно например использовать для отладки или создания первичного профиля взаимодействия
+
+delete: очистить состояния профиля. Например, скинуть счетчики
+
+3. сделать генератор профиля из HAR архива.
+
+для разбора прецедентов
