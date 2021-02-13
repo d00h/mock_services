@@ -17,6 +17,7 @@ COPY ./docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN ["chmod", "+x", "/app/docker-entrypoint.sh"]
 COPY ./mock_services /app/mock_services
 COPY ./profiles /app/profiles
+COPY ./specs /app/specs
 # ================================================================
 WORKDIR /app
 ENTRYPOINT [ "/app/docker-entrypoint.sh" ]

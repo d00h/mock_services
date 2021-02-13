@@ -6,7 +6,7 @@ from flask.app import setupmethod
 from flask.globals import LocalProxy
 from flask.logging import default_handler
 
-from mock_services.models import FakeRepository
+from mock_services.models import FakeRepository, SwaggerSpecRepository
 
 from .blueprints.root import root
 from .blueprints.apidocs import apidocs
@@ -17,15 +17,15 @@ from .blueprints.service.mailgun import mailgun
 class MockServicesApp(Flask):
 
     repository: FakeRepository
+    swagger_spec: SwaggerSpecRepository
 
     def __init__(self):
         Flask.__init__(self, __name__)
-    # config : MockServicesConfig
 
     @setupmethod
     def setup_app(self):
         self._init_logger()
-        self._init_repository()
+        self._init_repositories()
 
     # @setupmethod
     # def _init_config(self):
@@ -48,12 +48,13 @@ class MockServicesApp(Flask):
         self.logger.setLevel(log_level)
         self.logger.addHandler(handler)
 
-    def _init_repository(self):
-        self.repository = FakeRepository('/app/profiles')
+    def _init_repositories(self):
+        self.fake_responses = FakeRepository('/app/profiles')
+        self.swagger_specs = SwaggerSpecRepository('/app/specs')
 
     def get_fake_response(
             self, profile: str, endpoint: str, **kwargs) -> Optional[Response]:
-        session = self.repository[profile]
+        session = self.fake_responses[profile]
         response = session.take(endpoint)
         if response is not None:
             return response.render(**kwargs)

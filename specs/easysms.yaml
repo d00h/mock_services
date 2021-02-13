@@ -1,0 +1,61 @@
+swagger: "2.0"
+info: { "title": "EasySMS" }
+produces: [ "application/json" ]
+consumes: [ "application/json" ] 
+scheme: [ "http", "https" ] 
+tags:
+    - name: easysms
+      description: |
+        https://easy-sms.ru/
+        SMS рассылки в один клик!
+        Рекламные, информационные и сервисные сообщения
+
+# /service/{profile}
+#
+            # - in: path
+            #   name: profile
+            #   type: string
+            #   required: true
+            #   default: default
+
+
+paths:
+    /:
+        get:
+            tags: [ easysms ]
+            operationId: easysms.send_sms
+            summary: Oтправка смс
+            description: https://easy-sms.ru/podcluchenia/#api_sms
+            parameters:
+            - in: query
+              name: login
+              type: string
+              required: true
+            - in: query
+              name: password
+              type: string
+              required: true
+            - in: query
+              name: ordinator
+              type: string
+              required: true
+              description: Отправитель
+            - in: query
+              name: phone
+              type: string
+              required: true
+            - in: query
+              name: text
+              type: string
+              required: true
+            responses:
+                200:
+                  description: OK
+                  schema:
+                    type: object
+                    properties:
+                        sms_id:
+                            type: string
+                            format: uuid
+                        text:
+                            type: string

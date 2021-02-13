@@ -1,0 +1,41 @@
+swagger: "2.0"
+info: { "title": "CloudPaymants.ru" }
+produces: [ "application/json" ]
+consumes: [ "application/json" ] 
+scheme: [ "http", "https" ] 
+tags:
+    - name: cloudpayments
+      description: |
+        https://developers.cloudpayments.ru/#api
+        API — программный интерфейс системы для взаимодействия с системами ТСП.
+
+paths:
+    cards/auth:
+        post:
+            operationId: cloudpauments.cards_auth
+            summary: Авторизировать платеж (заморозить средства на карте).
+            tags: [ cloudpayments ]
+    void:
+        post:
+            operationId: cloudpauments.void
+            summary: Отменить авторизированный платеж.
+            tags: [ cloudpayments ]
+
+    tokens/charge:
+        post:
+            operationId: cloudpauments.tokens_charge
+            summary: Выполнить рекуррентный платеж по токену
+            tags: [ cloudpayments ]
+
+    cards/post3ds:
+        post:
+            operationId: cloudpauments.cards_post3ds
+            summary: Complete payment after 3DS
+            tags: [ cloudpayments ]
+
+    payments/find:
+        post:
+            operationId: cloudpauments.payments_find
+            summary:
+            tags: [ cloudpayments ]
+

@@ -1,0 +1,104 @@
+swagger: "2.0"
+info: { "title": "MailGun" }
+produces: [ "application/json" ]
+consumes: [ "application/json" ] 
+scheme: [ "http", "https" ] 
+tags:
+    - name: mailgun
+      description: |
+        https://documentation.mailgun.com/
+        Integrate email into your application with ease
+
+paths:
+    /messages:
+        get:
+            summary: Отправка почты
+            operationId: mailgun.messages
+            tags: [ mailgun ]
+            description:  |
+                https://documentation.mailgun.com/en/latest/api-sending.html#sending
+            consumes:
+              - multipart/form-data
+            parameters:
+              - in: formData
+                name: from
+                type: string
+                format: email
+                default: sender@gmail.com
+                required: true
+              - in: formData
+                name: to
+                type: array
+                collectionFormat: csv
+                items:
+                   type: string
+                   format: email
+                required: true
+              - in: formData
+                name: subject
+                type: string
+                required: true
+                default: SomeTitle
+              - in: formData
+                name: text
+                type: string
+                required: true
+                default: Hello user
+              - in: formData
+                name: html
+                type: string
+                required: false
+              - in: formData
+                name: "o:test"
+                type: string
+                required: false
+            responses:
+                200:
+                    description: OK
+                    schema:
+                        type: object
+                        properties:
+                            id:
+                                type: string
+                            message:
+                                type: string
+    /stats/total:
+        get:
+            summary: Получение статистики рассылки
+            tags: [ mailgun ]
+            description: |
+               https://documentation.mailgun.com/en/latest/api-stats.html#stats
+
+               BUG: попробывать не работает из-за ограничений передачи параметров swagger-ui в GET
+
+               сгенеренный curl работает нормально
+            parameters:
+              - in: path
+                name: profile
+                type: string
+                required: true
+                default: default
+              - in: formData
+                name: event
+                type: string
+                required: true
+                enum:
+                - accepted
+                - delivered
+                - failed
+                - opened
+                - clicked
+                - unsubscribed
+                - complained
+                - stored
+              - in: formData
+                name: duration
+                type: string
+                required: true
+                example: [ 12h, 1d ]
+                default: 1d
+            responses:
+                200:
+                    description: OK
+                    schema:
+                        type: object

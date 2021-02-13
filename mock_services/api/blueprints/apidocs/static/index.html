@@ -43,12 +43,12 @@
     <script>
     window.onload = function() {
       const ui = SwaggerUIBundle({
-        url: "./swagger.json",
+        url: "./specs/swagger.json",
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset.slice(1)
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset
         ],    
         plugins: [
           SwaggerUIBundle.plugins.DownloadUrl
