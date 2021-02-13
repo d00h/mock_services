@@ -38,6 +38,12 @@ python tools/example-easysms.py easysms_123
 
 где default, easysms_limit, easysms_weak, easysms_123 это профили из папки profiles
 
+# Использование 
+
+в разрабатываемом сервисе заменить host внешнего сервиса
+
+например: EASYSMS_URL=http://mock_services.develop/easysms_weak
+
 # Cтруктура проекта
 
 * mock_services flask проект
@@ -51,3 +57,16 @@ python tools/example-easysms.py easysms_123
 * /service/easysms/profile/ точка для замены сервиса
 * /profile/название управления профилями (планируется)
 
+# genarate-service-stub
+
+простая и грязная утилита генерирует начальный файл для сервиса из swagger spec
+
+
+'''shell
+python tools/generate-service-stub.py spec/cloudpayments.yaml
+python tools/generate-service-stub.py spec/mailgun.yaml -o mailgun.py
+python tools/generate-service-stub.py spec/easysms.yaml
+'''
+
+чисто теоретически возможно генерировать более полную версию исходника или делать это прям на лету
+, но на первом этапе этого достаточно.
