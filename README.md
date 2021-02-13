@@ -11,9 +11,13 @@
 # Идея
 
 Создать простой локальный сервер пути которого полностью повторяют api внешнего сервиса
-и дать возможность задавать ответы api через yaml файл.
+и дать возможность задавать ответы api через yaml файл профиля.
 
-все методы не определенные в yaml файле имеют имитирующий нормальную работу сервиса. 
+профиль это общее осмысленное название для какого то поведения внешней среды.
+
+например: google_auth_down, weak_connection, telegram_blocks
+
+все методы не определенные в yaml файле возвращают ответ имитирующий нормальную работу сервиса. 
 
 # Запуск
 
@@ -25,7 +29,7 @@ make build up
 
 открыть в браузере http://127.0.0.1:5000
 
-посмотреть как работает можно запустив
+посмотреть, как пример того, как сервис работает можно запустив:
 
 ```shell
 
@@ -46,7 +50,7 @@ python tools/example-easysms.py easysms_123
 
 ```python
 
-EASYSMS_URL=http://mock_services.develop/service/easysms/easysms_weak
+EASYSMS_URL=http://mock_services.develop/service/easysms/профиль
 
 ```
 
@@ -60,8 +64,8 @@ EASYSMS_URL=http://mock_services.develop/service/easysms/easysms_weak
 # Cтруктура api сервиса
 
 * /apidocs документация внешних сервисов и тестер 
-* /service/easysms/profile/ точка для замены сервиса
-* /profile/название управления профилями (планируется)
+* /service/easysms/профиль/ точка для замены сервиса
+* /profile/профиль управления профилями (планируется)
 
 # Профиль
 
@@ -105,18 +109,23 @@ EASYSMS_URL=http://mock_services.develop/service/easysms/easysms_weak
 описывает последовательность вызовов сервиса easysms
 
 1 вызов с вероятностью 50/50 либо sms_id = 1 либо sms_id = 2
+
 2 вызов sms_id = 3
+
+название endpoint берется из swagger 
 
 # generate-service-stub
 
 простая и грязная утилита генерирует начальный файл для сервиса из swagger spec
 
 
-'''shell
+```shell
+
 python tools/generate-service-stub.py spec/cloudpayments.yaml
 python tools/generate-service-stub.py spec/mailgun.yaml -o mailgun.py
 python tools/generate-service-stub.py spec/easysms.yaml
-'''
+
+```
 
 чисто теоретически возможно генерировать более полную версию исходника или делать это прям на лету
 , но на первом этапе этого достаточно.
@@ -124,15 +133,17 @@ python tools/generate-service-stub.py spec/easysms.yaml
 
 # точки расширения
 
-1. сделать /profile/название
+1. сделать /profile/профиль
 
-get: получить текуший профиль
+get: получить профиль
+
 put: записать новый профиль
+
 delete: удалить
 
-нужно для создания временных профилей и чтобы можно было бы асинхроноо использовать один сервер в многопоточной среде
+нужно для создания временных профилей и чтобы можно было бы асинхронно использовать один сервер в многопоточной среде
 
-2. сделать /logs/название
+2. сделать /logs/профиль
 
 get: получить список вызовов endpoint 
 по сути сниффер, можно например использовать для отладки или создания первичного профиля взаимодействия
