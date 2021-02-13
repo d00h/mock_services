@@ -1,23 +1,24 @@
 import logging
 from typing import Optional
 
-from flask import Flask, Response
+from flask import Flask, Response, current_app
 from flask.app import setupmethod
 from flask.globals import LocalProxy
 from flask.logging import default_handler
 
-from mock_services.models import FakeRepository, SwaggerSpecRepository
+from mock_services.models import FakeResponseRepository, SwaggerSpecRepository
 
-from .blueprints.root import root
 from .blueprints.apidocs import apidocs
-from .blueprints.service.easysms import easysms
-from .blueprints.service.mailgun import mailgun
+from .blueprints.cloudpayments import cloudpayments
+from .blueprints.easysms import easysms
+from .blueprints.mailgun import mailgun
+from .blueprints.root import root
 
 
 class MockServicesApp(Flask):
 
-    repository: FakeRepository
-    swagger_spec: SwaggerSpecRepository
+    fake_responses: FakeResponseRepository
+    swagger_specs: SwaggerSpecRepository
 
     def __init__(self):
         Flask.__init__(self, __name__)
@@ -26,12 +27,6 @@ class MockServicesApp(Flask):
     def setup_app(self):
         self._init_logger()
         self._init_repositories()
-
-    # @setupmethod
-    # def _init_config(self):
-    #     # TODO: Flast.config_class => Confi
-    #     self.confi = config.Config
-    #     self.config.from_object(self.confi)
 
     def _init_logger(self):
         self.logger.removeHandler(default_handler)
@@ -49,7 +44,7 @@ class MockServicesApp(Flask):
         self.logger.addHandler(handler)
 
     def _init_repositories(self):
-        self.fake_responses = FakeRepository('/app/profiles')
+        self.fake_responses = FakeResponseRepository('/app/profiles')
         self.swagger_specs = SwaggerSpecRepository('/app/specs')
 
     def get_fake_response(
@@ -67,7 +62,8 @@ def create_app() -> MockServicesApp:
 
     app.register_blueprint(root, url_prefix='/')
     app.register_blueprint(apidocs, url_prefix='/apidocs')
-    app.register_blueprint(easysms, url_prefix='/service/<profile>/easysms')
-    app.register_blueprint(mailgun, url_prefix='/service/<profile>/mailgun')
+    app.register_blueprint(easysms, url_prefix='/service/easysms')
+    app.register_blueprint(mailgun, url_prefix='/service/mailgun')
+    app.register_blueprint(cloudpayments, url_prefix='/service/cloudpayments')
 
     return LocalProxy(lambda: app)

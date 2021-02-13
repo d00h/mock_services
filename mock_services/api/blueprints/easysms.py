@@ -1,17 +1,16 @@
 import uuid
-
 from covador import opt
 from covador.flask import args, query_string
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 
-cloudpayments = Blueprint("cloudpayments", __name__)
+easysms = Blueprint("easysms", __name__)
 
 
-@cloudpayments.route('/', methods=['GET'])
+@easysms.route('/', methods=['GET'])
 @args(profile=str)
 @query_string(login=opt(str), password=opt(str),
               ordinator=str, phone=str, text=str)
-def send_sms(profile, login, password, ordinator, phone, text):
+def cards_auth(profile, login, password, ordinator, phone, text):
     return current_app.get_fake_response(
         profile=profile, endpoint=request.endpoint,
         login=login, password=password,

@@ -1,15 +1,19 @@
-"""
-# Generated from {{ filename }}
-from flask import Blueprint, current_app, jsonify
+"""# Generated from {{ filename }}
+from covador.flask import args
+from flask import Blueprint, current_app, jsonify, request
 
 {{ service }} = Blueprint("{{ service }}", __name__)
 {% for route in paths %}
 
-@{{ service }}.route('{{ route.path }}',
-                     endpoint='{{ service }}.{{ route.endpoint }}',
+@{{ service }}.route('{profile}/{{ route.path }}',
+                     endpoint='{{ route.endpoint }}',
                      methods=['{{ route.method }}'])
-def {{ route.endpoint }}(**kwargs):
-    return current_app.get_fake_response(**kwargs) or jsonify({})
+@args(profile=str)
+def {{ route.endpoint }}(profile, **kwargs):
+    return current_app.get_fake_response(
+        profile=profile,
+        endpoint=request.endpoint,
+        **kwargs) or jsonify({})
 {% endfor %}
 """
 import re
@@ -43,7 +47,8 @@ def list_paths(input_filename: str) -> Iterable[dict]:
             if not match:
                 raise KeyError(f'{uri} wrong operationId format {operation_id}')
             if match.group(1) != service:
-                raise KeyError(f'{uri} wrong operationId "{service}" != "{match.group(1)}"')
+                raise KeyError(
+                    f'{uri} wrong operationId "{service}" != "{match.group(1)}"')
             yield {'path': uri, 'method': method, 'endpoint': match.group(2)}
 
 

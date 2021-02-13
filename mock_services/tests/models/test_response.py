@@ -2,7 +2,7 @@ from collections import Counter
 
 import pytest
 
-from mock_services.models import FakeResponse, FakeSession
+from mock_services.models import FakeResponse, FakeResponseProfile
 
 
 def test_response_choice(fake):
@@ -31,12 +31,12 @@ def test_wrong_response_step(fake):
         FakeResponse(endpoint=fake.word(), step=-1)
 
 
-def test_session_step_by_step(fake):
+def test_profile_step_by_step(fake):
     endpoint = fake.word()
     resp0 = FakeResponse.json(endpoint=endpoint, step=0)
     resp1 = FakeResponse.timeout(endpoint=endpoint, step=1)
     resp3 = FakeResponse.timeout(endpoint=endpoint, step=3)
-    session = FakeSession(resp0, resp1, resp3)
+    session = FakeResponseProfile(resp0, resp1, resp3)
     for _ in range(2):
         assert session.take(endpoint) == resp0
         assert session.take(endpoint) == resp1
@@ -44,24 +44,24 @@ def test_session_step_by_step(fake):
         assert session.take(endpoint) == resp3
 
 
-def test_session_step_by_step_cleared(fake):
+def test_profile_step_by_step_cleared(fake):
     endpoint = fake.word()
     resp0 = FakeResponse.json(endpoint=endpoint, step=0)
     resp1 = FakeResponse.timeout(endpoint=endpoint, step=1)
     resp3 = FakeResponse.timeout(endpoint=endpoint, step=3)
-    session = FakeSession(resp0, resp1, resp3)
+    session = FakeResponseProfile(resp0, resp1, resp3)
     for _ in range(2):
         session.clear()
         assert session.take(endpoint) == resp0
         assert session.take(endpoint) == resp1
 
 
-def test_session_choice_by_chance(fake):
+def test_profile_choice_by_chance(fake):
     endpoint = fake.word()
     resp90 = FakeResponse.json(endpoint=endpoint, chance=90)
     resp10 = FakeResponse.timeout(endpoint=endpoint, chance=10)
     resp_other_endpoint = FakeResponse.timeout(endpoint=fake.word())
-    session = FakeSession(resp90, resp10, resp_other_endpoint)
+    session = FakeResponseProfile(resp90, resp10, resp_other_endpoint)
     result = list()
     for _ in range(1000):
         result.append(session.take(endpoint))

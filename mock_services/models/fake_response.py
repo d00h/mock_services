@@ -83,7 +83,7 @@ class FakeResponse(object):
             mimetype=self.mimetype, content_type=self.content_type)
 
 
-class FakeSession(object):
+class FakeResponseProfile(object):
 
     responses: DefaultDict[str, List[FakeResponse]]
     state: DefaultDict[str, int]
@@ -115,25 +115,25 @@ class FakeSession(object):
         return FakeResponse(body_template=endpoint)
 
     @classmethod
-    def from_yaml(cls, filename: str) -> 'FakeSession':
+    def from_yaml(cls, filename: str) -> 'FakeResponseProfile':
         with open(filename, 'rt', encoding='utf-8') as stream:
             data = yaml.safe_load(stream) or []
         responses = list(FakeResponse.from_dict(config) for config in data)
         return cls(*responses)
 
 
-class FakeRepository(object):
+class FakeResponseRepository(object):
 
     def __init__(self, profiles_path: str):
         self.profiles_path = profiles_path
-        self.sessions = dict()
+        self.profiles = dict()
 
-    def __getitem__(self, profile: str) -> FakeSession:
-        session = self.sessions.get(profile)
-        if session is None:
+    def __getitem__(self, profile: str) -> FakeResponseProfile:
+        profile = self.profiles.get(profile)
+        if profile is None:
             filename = path.join(self.profiles_path, f'{profile}.yaml')
             if not path.exists(filename):
                 raise FileNotFoundError(f'profile: {filename}')
-            session = FakeSession.from_yaml(filename)
-            self.sessions[profile] = session
-        return session
+            profile = FakeResponseProfile.from_yaml(filename)
+            self.profiles[profile] = profile
+        return profile
