@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from covador import args, opt, split
-from covador.flask import form
+from covador import opt, split
+from covador.flask import form, args
 from flask import Blueprint, current_app, jsonify, request
 
 mailgun = Blueprint("mailgun", __name__)

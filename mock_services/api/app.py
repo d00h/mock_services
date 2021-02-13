@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from flask import Flask, Response, current_app
+from flask import Flask, Response
 from flask.app import setupmethod
 from flask.globals import LocalProxy
 from flask.logging import default_handler
@@ -9,10 +9,8 @@ from flask.logging import default_handler
 from mock_services.models import FakeResponseRepository, SwaggerSpecRepository
 
 from .blueprints.apidocs import apidocs
-from .blueprints.cloudpayments import cloudpayments
-from .blueprints.easysms import easysms
-from .blueprints.mailgun import mailgun
 from .blueprints.root import root
+from .blueprints.service import cloudpayments, easysms, mailgun
 
 
 class MockServicesApp(Flask):
