@@ -42,7 +42,13 @@ python tools/example-easysms.py easysms_123
 
 в разрабатываемом сервисе заменить host внешнего сервиса
 
-например: EASYSMS_URL=http://mock_services.develop/easysms_weak
+например: 
+
+```python
+
+EASYSMS_URL=http://mock_services.develop/service/easysms/easysms_weak
+
+```
 
 # Cтруктура проекта
 
