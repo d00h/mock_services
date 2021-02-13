@@ -1,8 +1,9 @@
+---
 swagger: "2.0"
-info: { "title": "CloudPaymants.ru" }
-produces: [ "application/json" ]
-consumes: [ "application/json" ] 
-scheme: [ "http", "https" ] 
+info: {"title": "CloudPayments.ru"}
+produces: ["application/json"]
+consumes: ["application/json"]
+scheme: ["http", "https"]
 tags:
     - name: cloudpayments
       description: |
@@ -10,32 +11,180 @@ tags:
         API — программный интерфейс системы для взаимодействия с системами ТСП.
 
 paths:
-    cards/auth:
+    payments/cards/auth:
         post:
-            operationId: cloudpauments.cards_auth
+            operationId: cloudpauments.payments_cards_auth
             summary: Авторизировать платеж (заморозить средства на карте).
-            tags: [ cloudpayments ]
-    void:
+            externalDocs:
+                url: https://developers.cloudpayments.ru/#oplata-po-kriptogramme
+            tags: [cloudpayments]
+            parameters:
+                - in: body
+                  schema:
+                      $ref: "#/components/schemas/CloudPaymentsPay"
+            responses:
+                200:
+                    schema:
+                        $ref: "#/components/schemas/CloudPaymentsResult"
+
+    payments/void:
         post:
-            operationId: cloudpauments.void
+            operationId: cloudpauments.payments_void
             summary: Отменить авторизированный платеж.
-            tags: [ cloudpayments ]
+            externalDocs:
+                url: https://developers.cloudpayments.ru/#otmena-oplaty
+            tags: [cloudpayments]
 
-    tokens/charge:
+    payments/tokens/charge:
         post:
-            operationId: cloudpauments.tokens_charge
+            operationId: cloudpauments.payments_tokens_charge
             summary: Выполнить рекуррентный платеж по токену
-            tags: [ cloudpayments ]
+            externalDocs:
+                url: https://developers.cloudpayments.ru/#oplata-po-tokenu-rekarring
+            tags: [cloudpayments]
 
-    cards/post3ds:
+    payments/cards/post3ds:
         post:
-            operationId: cloudpauments.cards_post3ds
-            summary: Complete payment after 3DS
-            tags: [ cloudpayments ]
+            operationId: cloudpauments.payment_cards_post3ds
+            summary: Для завершения оплаты выполните следующий метод Post3ds.
+            externalDocs:
+                url: https://developers.cloudpayments.ru/#obrabotka-3-d-secure
+            tags: [cloudpayments]
+            parameters:
+                - in: body
+                  type: object
+                  properties:
+                     TransactionId:
+                        type: integer
+                        summary: Значение параметра MD
+                     PaRes:
+                        type: string
+                        summary: Значение одноименного параметра
+            responses:
+                200:
+                    schema:
+                        $ref: "#/components/schemas/CloudPaymentsResult"
 
     payments/find:
         post:
             operationId: cloudpauments.payments_find
-            summary:
-            tags: [ cloudpayments ]
+            summary: Проверка статуса платежа
+            externalDocs:
+                url: https://developers.cloudpayments.ru/#proverka-statusa-platezha
+            tags: [cloudpayments]
+            parameters:
+                - in: body
+                  type: object
+                  properties:
+                      InvoiceId:
+                          type: string
+            responses:
+                200:
+                    schema:
+                        $ref: "#/components/schemas/CloudPaymentsResult"
 
+components:
+    schemas:
+        CloudPaymentsPay:
+            type: object
+            properties:
+                Amount:
+                    type: integer
+                    summary: Сумма платежа
+                    required: true
+                Currency:
+                    type: string
+                    required: false
+                    summary: Валюта
+                    enum: ['RUB', 'USD', 'EUR', 'GBP']
+                    default: RUB
+                IpAddress:
+                    type: string
+                    summary: IP адрес плательщика
+                    required: true
+                Name:
+                    type: string
+                    summary: |
+                         Обязательный для всех платежей,
+                         кроме Apple Pay и Google Pay
+                         Имя держателя карты в латинице
+                    required: false
+                CardCryptogramPacket:
+                    type: string
+                    required: true
+                    summary: Криптограмма платежных данных
+                paymentUrl:
+                    type: string
+                    required: false
+                    summary: |
+                         Адрес сайта с которого совершается
+                         вызов скрипта checkout
+                InvoiceId:
+                    type: string
+                    required: false
+                    summary: Номер счета или заказа(наш OrderId)
+                Description:
+                    type: string
+                    required: false
+                    summary: Описание оплаты в свободной форме
+                CultureName:
+                    type: string
+                    required: false
+                    summary: Язык уведомлений.
+                    enum: ["ru-RU", "en-US"]
+                AccountId:
+                    type: string
+                    required: false
+                    summary: |
+                        Идентификатор пользователя
+                        (Обязательный для создания подписки и получения токена)
+                Email:
+                    type: string
+                    required: false
+                    summary: |
+                        E-mail плательщика на который будет отправлена квитанция
+                        об оплате
+                Payer:
+                    type: object
+                    required: false
+                    summary: |
+                        Доп. поле, куда передается информация о плательщике.
+                        Используйте следующие параметры:
+                            FirstName, LastName, MiddleName, Address, Birth,
+                            City, Country, Phone, Postcode
+                JsonData:
+                    type: object
+                    required: true
+                    summary: |
+                        Любые другие данные, которые будут связаны с
+                        транзакцией, в том числе инструкции для создания
+                        подписки или формирования онлайн-чека.
+
+                        Мы зарезервировали названия следующих параметров и
+                        отображаем их содержимое в реестре операций,
+                        выгружаемом в Личном Кабинете:
+                            name, firstName, middleName, lastName, nick, phone,
+                            address, comment, birthDate.
+
+        CloudPaymentsResult:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    summary: результат запроса
+                    required: true
+                message:
+                    type: string
+                    required: false
+                    summary: описание ошибки
+
+                model:
+                    $ref: "#/components/schemas/CloudPaymentsModel"
+
+        CloudPaymentsModel:
+            type: object
+            summary: расширенная информация
+            properties:
+                TransactionId:
+                    type: string
+                    format: uuid

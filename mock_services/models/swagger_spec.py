@@ -22,8 +22,9 @@ class SwaggerSpecRepository(object):
             return yaml.safe_load(stream) or {}
 
     @staticmethod
-    def _add_prefix_path(spec: dict) -> dict:
-        prefix = '/service/{profile}'
+    def _add_prefix_path(service: str, spec: dict) -> dict:
+        prefix = path.join('/service', service, '{profile}')
+
         parameter = {
             'in': 'path',
             'name': 'profile',
@@ -33,7 +34,7 @@ class SwaggerSpecRepository(object):
         }
         old_paths, new_paths = spec.get('paths', {}), {}
         for old_uri, old_methods in old_paths.items():
-            new_uri = path.join('/service/{profile}', old_uri.lstrip('/'))
+            new_uri = path.join(prefix, old_uri.lstrip('/'))
             new_methods = copy(old_methods)
             new_paths[new_uri] = new_methods
             for body in new_methods.values():
@@ -43,18 +44,20 @@ class SwaggerSpecRepository(object):
                     body['parameters'] = [parameter]
         return {
             'paths': new_paths,
-            'tags': spec.get('tags', [])
+            'tags': spec.get('tags', []),
+            'components': spec.get('components', {})
         }
 
     @property
     def all(self) -> dict:
-        paths, tags = dict(), list()
+        paths, tags, schemas = dict(), list(), dict()
         for filename in listdir(self.folder):
             if not fnmatch(filename, '*.yaml'):
                 continue
             service, _ = path.splitext(filename)
-            spec = self._add_prefix_path(self[service])
+            spec = self._add_prefix_path(service, self[service])
             paths.update(spec.get('paths', {}))
+            schemas.update(spec.get('components', {}).get('schemas', {}))
             tags.extend(spec.get('tags', []))
         return {
             'swagger': '2.0',
@@ -63,5 +66,8 @@ class SwaggerSpecRepository(object):
             'produces': ['application/json'],
             'schemes': ['http', 'https'],
             'paths': paths,
-            'tags': tags
+            'tags': tags,
+            'components': {
+                'schemas': schemas
+            }
         }
