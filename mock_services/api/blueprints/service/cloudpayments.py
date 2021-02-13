@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, jsonify, request
 cloudpayments = Blueprint("cloudpayments", __name__)
 
 
-@cloudpayments.route('{profile}/payments/cards/auth',
+@cloudpayments.route('<profile>/payments/cards/auth',
                      endpoint='payments_cards_auth', methods=['post'])
 @args(profile=str)
 def payments_cards_auth(profile, **kwargs):
@@ -17,7 +17,7 @@ def payments_cards_auth(profile, **kwargs):
     return jsonify(result)
 
 
-@cloudpayments.route('{profile}/payments/void',
+@cloudpayments.route('<profile>/payments/void',
                      endpoint='payments_void', methods=['post'])
 @args(profile=str)
 def payments_void(profile, **kwargs):
@@ -29,7 +29,7 @@ def payments_void(profile, **kwargs):
     return jsonify(result)
 
 
-@cloudpayments.route('{profile}/payments/tokens/charge',
+@cloudpayments.route('<profile>/payments/tokens/charge',
                      endpoint='payments_tokens_charge', methods=['post'])
 @args(profile=str)
 def payments_tokens_charge(profile, **kwargs):
@@ -41,7 +41,7 @@ def payments_tokens_charge(profile, **kwargs):
     return jsonify(result)
 
 
-@cloudpayments.route('{profile}/payments/cards/post3ds',
+@cloudpayments.route('<profile>/payments/cards/post3ds',
                      endpoint='payment_cards_post3ds', methods=['post'])
 @args(profile=str)
 def payment_cards_post3ds(profile, **kwargs):
@@ -53,7 +53,7 @@ def payment_cards_post3ds(profile, **kwargs):
     return jsonify(result)
 
 
-@cloudpayments.route('{profile}/payments/find',
+@cloudpayments.route('<profile>/payments/find',
                      endpoint='payments_find', methods=['post'])
 @args(profile=str)
 def payments_find(profile, **kwargs):
@@ -63,3 +63,4 @@ def payments_find(profile, **kwargs):
         return response
     result = {}
     return jsonify(result)
+

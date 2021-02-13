@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, jsonify, request
 {{ service }} = Blueprint("{{ service }}", __name__)
 {% for route in paths %}
 
-@{{ service }}.route('{profile}/{{ route.path }}',
+@{{ service }}.route('<profile>/{{ route.path }}',
                      endpoint='{{ route.endpoint }}', methods=['{{ route.method }}'])
 @args(profile=str)
 def {{ route.endpoint }}(profile, **kwargs):
