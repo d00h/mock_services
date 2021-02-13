@@ -6,14 +6,15 @@ from flask import Blueprint, current_app, jsonify, request
 {% for route in paths %}
 
 @{{ service }}.route('{profile}/{{ route.path }}',
-                     endpoint='{{ route.endpoint }}',
-                     methods=['{{ route.method }}'])
+                     endpoint='{{ route.endpoint }}', methods=['{{ route.method }}'])
 @args(profile=str)
 def {{ route.endpoint }}(profile, **kwargs):
-    return current_app.get_fake_response(
-        profile=profile,
-        endpoint=request.endpoint,
-        **kwargs) or jsonify({})
+    response = current_app.get_fake_response(
+        profile=profile, endpoint=request.endpoint, **kwargs)
+    if response is not None:
+        return response
+    result = {}
+    return jsonify(result)
 {% endfor %}
 """
 import re
