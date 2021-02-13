@@ -128,12 +128,12 @@ class FakeResponseRepository(object):
         self.profiles_path = profiles_path
         self.profiles = dict()
 
-    def __getitem__(self, profile: str) -> FakeResponseProfile:
-        profile = self.profiles.get(profile)
+    def __getitem__(self, name: str) -> FakeResponseProfile:
+        profile = self.profiles.get(name)
         if profile is None:
-            filename = path.join(self.profiles_path, f'{profile}.yaml')
+            filename = path.join(self.profiles_path, f'{name}.yaml')
             if not path.exists(filename):
-                raise FileNotFoundError(f'profile: {filename}')
+                raise FileNotFoundError(f'profile: {name}')
             profile = FakeResponseProfile.from_yaml(filename)
-            self.profiles[profile] = profile
+            self.profiles[name] = profile
         return profile

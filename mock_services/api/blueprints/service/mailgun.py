@@ -1,13 +1,13 @@
 from datetime import datetime
 
 from covador import opt, split
-from covador.flask import form, args
+from covador.flask import args, form
 from flask import Blueprint, current_app, jsonify, request
 
 mailgun = Blueprint("mailgun", __name__)
 
 
-@mailgun.route('/{profile}/messages', methods=['POST'])
+@mailgun.route('/<profile>/messages', methods=['POST'])
 @args(profile=str)
 @form(**{
     'from': str,
@@ -29,7 +29,7 @@ def messages(profile, **kwargs):
     )
 
 
-@mailgun.route('/{profile}/stats/total', methods=['GET'])
+@mailgun.route('/<profile>/stats/total', methods=['GET'])
 @args(profile=str)
 def stats(profile, **kwargs):
     response = current_app.get_fake_response(

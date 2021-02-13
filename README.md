@@ -25,21 +25,29 @@ make build up
 
 открыть в браузере http://127.0.0.1:5000
 
+посмотреть как работает можно запустив
+
+```shell
+
+python tools/example-easysms.py default
+python tools/example-easysms.py easysms_limit
+python tools/example-easysms.py easysms_weak
+python tools/example-easysms.py easysms_123
+
+```
+
+где default, easysms_limit, easysms_weak, easysms_123 это профили из папки profiles
+
 # Cтруктура проекта
 
-mock_services
-specs 
-profiles 
-tools 
+* mock_services flask проект
+* specs документация внешних сервисов 
+* profiles профили состояния 
+* tools дополнительные утилиты для разработки 
 
 # Cтруктура api сервиса
 
-# Внутренности
+* /apidocs документация внешних сервисов и тестор 
+* /service/easysms/profile/ точка для замены сервиса
+* /profile/название управления профилями (планируется)
 
-создает 
-
-   endpoint service/**profile**/external_service/.....
-
-где:
-
-   * profile [ sms_limit, default, bill_down ]_
