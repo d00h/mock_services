@@ -1,7 +1,15 @@
-from confi import BaseEnvironConfig, ConfigField
+from confi import BaseEnvironConfig, BooleanConfig, ConfigField, IntConfig
 
 
-class Config(BaseEnvironConfig):
+class MockServicesConfig(BaseEnvironConfig):
 
-    COMMIT_HASH = ConfigField(required=True)
-    COMMIT_MESSAGE = ConfigField(required=True)
+    HOST = ConfigField(default='0.0.0.0')
+    PORT = IntConfig(default=5000)
+    DEBUG = BooleanConfig(default=False)
+
+    COMMIT_HASH = ConfigField()
+    COMMIT_MESSAGE = ConfigField()
+
+    REDIS_HOST = ConfigField(required=True)
+    REDIS_PORT = IntConfig(default=6379)
+    REDIS_PROFILE_DB = IntConfig(default=0)

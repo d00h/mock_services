@@ -1,16 +1,26 @@
 version: "3"
 services:
-  api:
-    build:
-      context: .
-    image: local/mock_services:dev
-    command: gunicorn-server
-    # command: flask-server
-    # restart: always
-    ports:
-      - 5000:5000
-    volumes:
-      - "./mock_services:/app/mock_services:ro"
-      - "./profiles:/app/profiles:ro"
-      - "./specs:/app/specs:ro"
+    api:
+        build:
+            context: .
+        image: local/mock_services:dev
+        # command: gunicorn-server
+        command: flask-server
+        # restart: always
+        ports:
+        - 5400:5000
+        volumes:
+        - "./mock_services:/app/mock_services:ro"
+        - "./profiles:/app/profiles:ro"
+        - "./specs:/app/specs:ro"
+        env_file:
+        - .env.develop
+        environment:
+        - COMMIT_HASH
+        - COMMIT_MESSAGE
+
+    redis:
+        image: redis:6.0.10-alpine
+        ports:
+        - 5479:6379
 

@@ -1,16 +1,17 @@
 import logging
 from typing import Optional
 
+import redis
 from flask import Flask, Response
 from flask.app import setupmethod
 from flask.globals import LocalProxy
 from flask.logging import default_handler
 
+from mock_services.api.blueprints.apidocs import apidocs
+from mock_services.api.blueprints.root import root
+from mock_services.api.blueprints.service import cloudpayments, easysms, mailgun
+from mock_services.config import MockServicesConfig
 from mock_services.models import FakeResponseRepository, SwaggerSpecRepository
-
-from .blueprints.apidocs import apidocs
-from .blueprints.root import root
-from .blueprints.service import cloudpayments, easysms, mailgun
 
 
 class MockServicesApp(Flask):
@@ -18,13 +19,15 @@ class MockServicesApp(Flask):
     fake_responses: FakeResponseRepository
     swagger_specs: SwaggerSpecRepository
 
-    def __init__(self):
+    def __init__(self, config):
         Flask.__init__(self, __name__)
+        self.config.update(config)
 
     @setupmethod
     def setup_app(self):
         self._init_logger()
         self._init_repositories()
+        self._init_redis()
 
     def _init_logger(self):
         self.logger.removeHandler(default_handler)
@@ -41,6 +44,17 @@ class MockServicesApp(Flask):
         self.logger.setLevel(log_level)
         self.logger.addHandler(handler)
 
+    def _init_redis(self):
+        r = redis.Redis(host=self.config.REDIS_HOST,
+                        port=self.config.REDIS_PORT,
+                        db=self.config.REDIS_PROFILES_DB)
+        r.get('111')
+# >> > r.set('foo', 'bar')
+
+
+# >> > r = redis.Redis(host='localhost', port=6379, db=0)
+# >> > r.set('foo', 'bar')
+
     def _init_repositories(self):
         self.fake_responses = FakeResponseRepository('/app/profiles')
         self.swagger_specs = SwaggerSpecRepository('/app/specs')
@@ -55,8 +69,7 @@ class MockServicesApp(Flask):
 
 
 def create_app() -> MockServicesApp:
-    app = MockServicesApp()
-    app.setup_app()
+    app = MockServicesApp(config=MockServicesConfig.as_dict())
 
     app.register_blueprint(root, url_prefix='/')
     app.register_blueprint(apidocs, url_prefix='/apidocs')
