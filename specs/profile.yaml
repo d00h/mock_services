@@ -13,7 +13,7 @@ paths:
         get:
             tags: [profile]
             operationId: profile.list_profiles
-            summary: список текущих профилей мокирования сервера
+            summary: получить список текущих профилей
             responses:
                 200:
                     description: OK
@@ -21,14 +21,106 @@ paths:
                         type: array
                         items:
                             type: string
+                        example: [easysms_weak, test123, dev1]
 
-# components:
-#     schemas:
-#         EasySmsResponse:
-#             type: object
-#             properties:
-#                 sms_id:
-#                     type: string
-#                     format: uuid
-#                 text:
-#                     type: string
+
+    /profile/{profile}:
+        get:
+            tags: [profile]
+            operationId: profile.get_profile
+            summary: получить профиль
+            responses:
+                200:
+                    description: OK
+                    schema:
+                        $ref: '#/components/schemas/ProfileConfig'
+        post:
+            tags: [profile]
+            operationId: profile.set_profile
+            summary: загрузить профиль в память сервера
+            parameters:
+            - in: body
+              schema:
+                $ref: '#/components/schemas/ProfileConfig'
+            responses:
+                200:
+                    description: OK
+
+        delete:
+            tags: [profile]
+            operationId: profile.set_profile
+            summary: удалить профиль из памяти сервера
+
+    /profile/{profile}/logs:
+
+        get:
+            tags: [profile]
+            operationId: profile.get_profile_logs
+            summary: очистить логи профиля
+            responses:
+                200:
+                    description: OK
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/components/schemas/ProfileLog'
+
+        delete:
+            tags: [profile]
+            operationId: profile.clear_profile_logs
+            summary: очистить логи профиля(скинуть состояние)
+
+components:
+
+    schemas:
+
+        ProfileEndpoint:
+            type: string
+            example: easysms.send_sms
+
+        ProfileFakeResponse:
+            type: object
+            properties:
+                endpoint:
+                    $ref: '#/components/schemas/ProfileEndpoint'
+                status:
+                    summary: статус ответа
+                    type: integer
+                    example: 200
+                content_type:
+                    type: string
+                    default: application/json
+                    required: false
+                    summary: mime type ответа
+                body_template:
+                    type: string
+                    summary: ответ
+                    example: |
+                       { "message": "hello from server" }
+                step:
+                    type: integer
+                    summary: шаг ответа
+                    default: 0
+                chance:
+                    type: integer
+                    summary: шанс ответа на текущем шаге
+                    required: false
+                    default: 100
+                    
+        ProfileLog:
+            type: object
+            properties:
+                start_time:
+                    type: string
+                    format: date-time
+                endpoint:
+                    $ref: '#/components/schemas/ProfileEndpoint'
+                request:
+                    type: object
+                response:
+                    type: object
+
+        ProfileConfig:
+            type: array
+            items:
+                $ref: '#/components/schemas/ProfileFakeResponse'
