@@ -45,15 +45,10 @@ class MockServicesApp(Flask):
         self.logger.addHandler(handler)
 
     def _init_redis(self):
-        r = redis.Redis(host=self.config.REDIS_HOST,
-                        port=self.config.REDIS_PORT,
-                        db=self.config.REDIS_PROFILES_DB)
+        r = redis.Redis(host=self.config['REDIS_HOST'],
+                        port=self.config['REDIS_PORT'],
+                        db=self.config['REDIS_PROFILE_CONFIG_DB'])
         r.get('111')
-# >> > r.set('foo', 'bar')
-
-
-# >> > r = redis.Redis(host='localhost', port=6379, db=0)
-# >> > r.set('foo', 'bar')
 
     def _init_repositories(self):
         self.fake_responses = FakeResponseRepository('/app/profiles')
@@ -70,7 +65,7 @@ class MockServicesApp(Flask):
 
 def create_app() -> MockServicesApp:
     app = MockServicesApp(config=MockServicesConfig.as_dict())
-
+    app.setup_app()
     app.register_blueprint(root, url_prefix='/')
     app.register_blueprint(apidocs, url_prefix='/apidocs')
     app.register_blueprint(easysms, url_prefix='/service/easysms')

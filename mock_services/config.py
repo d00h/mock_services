@@ -12,4 +12,5 @@ class MockServicesConfig(BaseEnvironConfig):
 
     REDIS_HOST = ConfigField(required=True)
     REDIS_PORT = IntConfig(default=6379)
-    REDIS_PROFILE_DB = IntConfig(default=0)
+    REDIS_PROFILE_CONFIG_DB = IntConfig(default=0)
+    REDIS_PROFILE_LOG_DB = IntConfig(default=1)

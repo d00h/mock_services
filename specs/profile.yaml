@@ -1,0 +1,34 @@
+---
+swagger: "2.0"
+info: {"title": "Profile"}
+produces: ["application/json"]
+consumes: ["application/json"]
+scheme: ["http", "https"]
+tags:
+    - name: profile
+      description: управление поведением сервиса
+
+paths:
+    /profile:
+        get:
+            tags: [profile]
+            operationId: profile.list_profiles
+            summary: список текущих профилей мокирования сервера
+            responses:
+                200:
+                    description: OK
+                    schema:
+                        type: array
+                        items:
+                            type: string
+
+# components:
+#     schemas:
+#         EasySmsResponse:
+#             type: object
+#             properties:
+#                 sms_id:
+#                     type: string
+#                     format: uuid
+#                 text:
+#                     type: string
