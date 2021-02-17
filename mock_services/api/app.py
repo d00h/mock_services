@@ -20,7 +20,7 @@ class MockServicesApp(Flask):
     swagger_specs: SwaggerSpecRepository
 
     def __init__(self, config):
-        Flask.__init__(self, __name__)
+        Flask.__init__(self, __name__, static_folder='static')
         self.config.update(config)
 
     @setupmethod
@@ -52,7 +52,7 @@ class MockServicesApp(Flask):
 
     def _init_repositories(self):
         self.fake_responses = FakeResponseRepository('/app/profiles')
-        self.swagger_specs = SwaggerSpecRepository('/app/specs')
+        self.swagger_specs = SwaggerSpecRepository('/app/specs/service')
 
     def get_fake_response(
             self, profile: str, endpoint: str, **kwargs) -> Optional[Response]:
@@ -65,11 +65,12 @@ class MockServicesApp(Flask):
 
 def create_app() -> MockServicesApp:
     app = MockServicesApp(config=MockServicesConfig.as_dict())
+    
     app.setup_app()
-    app.register_blueprint(root, url_prefix='/')
-    app.register_blueprint(apidocs, url_prefix='/apidocs')
-    app.register_blueprint(easysms, url_prefix='/service/easysms')
-    app.register_blueprint(mailgun, url_prefix='/service/mailgun')
-    app.register_blueprint(cloudpayments, url_prefix='/service/cloudpayments')
+    app.register_blueprint(root)
+    app.register_blueprint(apidocs) 
+    app.register_blueprint(easysms)
+    app.register_blueprint(mailgun)
+    app.register_blueprint(cloudpayments)
 
     return LocalProxy(lambda: app)

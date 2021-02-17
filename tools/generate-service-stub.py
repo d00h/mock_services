@@ -2,7 +2,8 @@
 from covador.flask import args
 from flask import Blueprint, current_app, jsonify, request
 
-{{ service }} = Blueprint("{{ service }}", __name__)
+{{ service }} = Blueprint("{{ service }}", __name__,
+                          url_prefix='/service/{{ service }}')
 {% for route in paths %}
 
 @{{ service }}.route('<profile>/{{ route.path }}',

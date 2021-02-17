@@ -2,7 +2,8 @@
 from covador.flask import args
 from flask import Blueprint, current_app, jsonify, request
 
-cloudpayments = Blueprint("cloudpayments", __name__)
+cloudpayments = Blueprint("cloudpayments", __name__,
+                          url_prefix='/service/cloudpayments')
 
 
 @cloudpayments.route('<profile>/payments/cards/auth',

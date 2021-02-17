@@ -4,7 +4,7 @@ from covador import opt
 from covador.flask import args, query_string
 from flask import Blueprint, current_app, jsonify, request
 
-easysms = Blueprint("easysms", __name__)
+easysms = Blueprint("easysms", __name__, url_prefix='/service/easysms')
 
 
 @easysms.route('/<profile>/', methods=['get'], endpoint='send_sms')

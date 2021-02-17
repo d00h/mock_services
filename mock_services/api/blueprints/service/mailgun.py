@@ -4,7 +4,8 @@ from covador import opt, split
 from covador.flask import args, form
 from flask import Blueprint, current_app, jsonify, request
 
-mailgun = Blueprint("mailgun", __name__)
+mailgun = Blueprint("mailgun", __name__,
+                    url_prefix='/service/mailgun')
 
 
 @mailgun.route('/<profile>/messages', methods=['POST'])
