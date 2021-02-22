@@ -22,7 +22,7 @@ class SwaggerSpec(object):
 
     def __init__(self, info: dict = None, consumes: list = None, produces: list = None,
                  schemas: list = None, paths: dict = None, tags: list = None,
-                 components_schemas: dict = None):
+                 components_schemas: dict = None, **unused):
         self.info = info or dict()
         self.consumes = consumes or ['application/json']
         self.produces = produces or ['application/json']
@@ -74,7 +74,8 @@ class SwaggerSpec(object):
         if not path.exists(filename):
             raise FileNotFoundError(f'spec: {filename}')
         with open(filename, 'rt', encoding='utf-8') as stream:
-            return yaml.safe_load(stream) or {}
+            data = yaml.safe_load(stream) or {}
+            return cls(**data)
 
 
 class SwaggerSpecRepository(object):

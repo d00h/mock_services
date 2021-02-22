@@ -16,7 +16,7 @@ def aggregate_static(path):
 
 @apidocs.route('/swagger.json')
 def aggregate_spec():
-    spec = current_app.swagger_specs.aggregate()
+    spec = current_app.swagger.to_dict()
     return jsonify(spec)
 
 
@@ -27,7 +27,7 @@ def service_index(service):
 
 @apidocs.route('/<service>/swagger.json')
 def service_spec(service):
-    spec = current_app.swagger_specs[service]
+    spec = current_app.swagger.service[service].to_dict()
     return jsonify(spec)
 
 

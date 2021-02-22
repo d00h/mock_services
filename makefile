@@ -1,25 +1,22 @@
 all:
 	@echo nope
 
-COMMIT_HASH := $(git rev-parse --short HEAD)
-COMMIT_MESSAGE :=  $(git log -1 --pretty=%B)
 DOCKER_COMPOSE = docker-compose
-DOCKER_COMPOSE_DEVELOP = $(DOCKER_COMPOSE) --env-file .env.develop
-DOCKER_COMPOSE_TEST := $(DOCKER_COMPOSE) --env-file .env.test
 
 ps:
-
-	@$(DOCKER_COMPOSE_DEVELOP) ps
+	@$(DOCKER_COMPOSE) ps
 
 up:
-	$(DOCKER_COMPOSE_DEVELOP) up --detach
+	$(DOCKER_COMPOSE) up --detach
 
 down:
-	@$(DOCKER_COMPOSE_DEVELOP) down
+	@$(DOCKER_COMPOSE) down
 
 logs: up
-	@$(DOCKER_COMPOSE_DEVELOP) logs --follow
+	@$(DOCKER_COMPOSE) logs --follow
 
+build: export COMMIT_HASH=$(shell git rev-parse --short HEAD)
+build: export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
 build:
 	$(DOCKER_COMPOSE) build
 
@@ -28,4 +25,7 @@ open:
 
 .PHONY: tests
 tests:
-	@$(DOCKER_COMPOSE_TEST) run --rm api tests
+	@bash -c " \
+	    trap '$(DOCKER_COMPOSE) down' EXIT; \
+	    $(DOCKER_COMPOSE) up --detach redis; \
+	    $(DOCKER_COMPOSE) run --rm api tests;"

@@ -1,6 +1,14 @@
 from confi import BaseEnvironConfig, BooleanConfig, ConfigField, IntConfig
 
 
+def weeks(value):
+    return value * 7 * 24 * 60
+
+
+def minutes(value):
+    return value * 60
+
+
 class MockServicesConfig(BaseEnvironConfig):
 
     HOST = ConfigField(default='0.0.0.0')
@@ -10,7 +18,5 @@ class MockServicesConfig(BaseEnvironConfig):
     COMMIT_HASH = ConfigField()
     COMMIT_MESSAGE = ConfigField()
 
-    REDIS_HOST = ConfigField(required=True)
-    REDIS_PORT = IntConfig(default=6379)
-    REDIS_PROFILE_CONFIG_DB = IntConfig(default=0)
-    REDIS_PROFILE_LOG_DB = IntConfig(default=1)
+    REDIS_URL = ConfigField()
+    REDIS_EXPIRE = IntConfig(default=weeks(1))

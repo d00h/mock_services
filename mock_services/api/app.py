@@ -1,35 +1,27 @@
 import logging
-from typing import Optional
 
-import redis
-from flask import Flask, Response
-from flask.app import setupmethod
+from flask import Flask
 from flask.globals import LocalProxy
 from flask.logging import default_handler
+from redis import Redis
 
 from mock_services.api.blueprints.apidocs import apidocs
 from mock_services.api.blueprints.root import root
+from mock_services.api.blueprints.mock_profiles import mock_profiles
 from mock_services.api.blueprints.service import cloudpayments, easysms, mailgun
-from mock_services.config import MockServicesConfig
-from mock_services.models import FakeResponseRepository, SwaggerSpecRepository
+from mock_services.config import MockServicesConfig as confi
+from mock_services.models import MockService, SwaggerAggregator
 
 
 class MockServicesApp(Flask):
 
-    fake_responses: FakeResponseRepository
-    swagger_specs: SwaggerSpecRepository
+    swagger: SwaggerAggregator
+    mock_service: MockService
 
-    def __init__(self, config):
+    def __init__(self):
         Flask.__init__(self, __name__, static_folder='static')
-        self.config.update(config)
 
-    @setupmethod
-    def setup_app(self):
-        self._init_logger()
-        self._init_repositories()
-        self._init_redis()
-
-    def _init_logger(self):
+    def init_logger(self):
         self.logger.removeHandler(default_handler)
 
         log_level = logging.DEBUG
@@ -44,31 +36,25 @@ class MockServicesApp(Flask):
         self.logger.setLevel(log_level)
         self.logger.addHandler(handler)
 
-    def _init_redis(self):
-        r = redis.Redis(host=self.config['REDIS_HOST'],
-                        port=self.config['REDIS_PORT'],
-                        db=self.config['REDIS_PROFILE_CONFIG_DB'])
-        r.get('111')
+    def init_mock_service(self, redis_url, redis_expire):
+        redis = Redis.from_url(redis_url)
+        self.mock_service = MockService(redis, redis_expire)
 
-    def _init_repositories(self):
-        self.fake_responses = FakeResponseRepository('/app/profiles')
-        self.swagger_specs = SwaggerSpecRepository('/app/specs/service')
-
-    def get_fake_response(
-            self, profile: str, endpoint: str, **kwargs) -> Optional[Response]:
-        session = self.fake_responses[profile]
-        response = session.take(endpoint)
-        if response is not None:
-            return response.render(**kwargs)
-        return None
+    def init_swagger(self, folder):
+        self.swagger = SwaggerAggregator(folder)
 
 
 def create_app() -> MockServicesApp:
-    app = MockServicesApp(config=MockServicesConfig.as_dict())
-    
-    app.setup_app()
+    app = MockServicesApp()
+    app.config.update(confi.as_dict())
+
+    app.init_logger()
+    app.init_mock_service(confi.REDIS_URL, confi.REDIS_EXPIRE)
+    app.init_swagger('/app/specs')
+
     app.register_blueprint(root)
-    app.register_blueprint(apidocs) 
+    app.register_blueprint(apidocs)
+    app.register_blueprint(mock_profiles)
     app.register_blueprint(easysms)
     app.register_blueprint(mailgun)
     app.register_blueprint(cloudpayments)

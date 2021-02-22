@@ -1,10 +1,7 @@
-from collections import defaultdict
-from dataclasses import dataclass
-from os import path
+from dataclasses import asdict, dataclass
 from random import randrange
-from typing import DefaultDict, Iterable, List, Optional
+from typing import List, Optional
 
-import yaml
 from faker import Faker
 from flask import Response as FlaskResponse
 from jinja2 import Template
@@ -34,45 +31,17 @@ class FakeResponse(object):
     content_type: str = None
 
     def __post_init__(self):
+        """ check dataclass asserts """
         if self.step < 0:
-            raise ValueError(f'step = {self.step}')
+            raise ValueError(f'step({self.step} must be positive')
         if self.chance <= 0:
-            raise ValueError(f'chance = {self.chance}')
+            raise ValueError(f'chance({self.chance}) must be positive')
 
     def __hash__(self):
         return hash(str(self))
 
-    @classmethod
-    def json(cls, endpoint, **kwargs) -> 'FakeResponse':
-        return cls(endpoint, content_type='application/json', **kwargs)
-
-    @classmethod
-    def timeout(cls, endpoint, **kwargs) -> 'FakeResponse':
-        return cls(endpoint, status=GatewayTimeout.code, **kwargs)
-
-    @classmethod
-    def from_dict(cls, config: dict) -> 'FakeResponse':
-        return cls(**config)
-
-    @staticmethod
-    def choice(responses: Iterable['FakeResponse']) -> Optional['FakeResponse']:
-        """
-        random choice one of responses depends of its chance
-        """
-        responses = list(responses)
-        if responses:
-            cum_chance, chances = 0, list()
-            for response in responses:
-                cum_chance += response.chance
-                chances.append(cum_chance)
-            rnd_chance = randrange(0, cum_chance)
-            for chance, response in zip(chances, responses):
-                if chance > rnd_chance:
-                    return response
-        return None
-
     def render(self, **kwargs) -> FlaskResponse:
-        if self.body_template:
+        if self.body_template and kwargs:
             template = Template(self.body_template)
             template.globals.update(**TEMPLATE_FUNCS)
             body = template.render(**kwargs)
@@ -82,58 +51,82 @@ class FakeResponse(object):
             response=body, status=self.status, headers=self.headers,
             mimetype=self.mimetype, content_type=self.content_type)
 
-
-class FakeResponseProfile(object):
-
-    responses: DefaultDict[str, List[FakeResponse]]
-    state: DefaultDict[str, int]
-
-    def __init__(self, *responses):
-        self.responses = defaultdict(list)
-        for response in sorted(responses, key=lambda r: r.step):
-            self.responses[response.endpoint].append(response)
-        self.steps = defaultdict(int)
-
-    def clear(self):
-        self.steps.clear()
-
-    def take(self, endpoint: str) -> FakeResponse:
-        '''
-        sequentially selects requests
-        '''
-        try:
-            if endpoint not in self.responses:
-                return None
-            responses = self.responses[endpoint]
-            step = self.steps[endpoint]
-            max_step = responses[-1].step
-            step = step % (max_step+1)
-            responses = filter(lambda r: r.step == step, responses)
-            return FakeResponse.choice(responses)
-        finally:
-            self.steps[endpoint] += 1
-        return FakeResponse(body_template=endpoint)
+    @classmethod
+    def json(cls, endpoint, **kwargs) -> 'FakeResponse':
+        return cls(endpoint, content_type='application/json', **kwargs)
 
     @classmethod
-    def from_yaml(cls, filename: str) -> 'FakeResponseProfile':
-        with open(filename, 'rt', encoding='utf-8') as stream:
-            data = yaml.safe_load(stream) or []
-        responses = list(FakeResponse.from_dict(config) for config in data)
-        return cls(*responses)
+    def text(cls, endpoint, **kwargs) -> 'FakeResponse':
+        return cls(endpoint, content_type='text/plain', **kwargs)
+
+    @classmethod
+    def timeout(cls, endpoint, **kwargs) -> 'FakeResponse':
+        return cls(endpoint, status=GatewayTimeout.code, **kwargs)
+
+    @classmethod
+    def from_dict(cls, config: dict) -> 'FakeResponse':
+        if not isinstance(config, dict):
+            raise ValueError('data is not dict')
+        return cls(**config)
 
 
-class FakeResponseRepository(object):
+class FakeResponseCollection(object):
 
-    def __init__(self, profiles_path: str):
-        self.profiles_path = profiles_path
-        self.profiles = dict()
+    """
+         lightwear wrapper with helper for manipulate fake_response
 
-    def __getitem__(self, name: str) -> FakeResponseProfile:
-        profile = self.profiles.get(name)
-        if profile is None:
-            filename = path.join(self.profiles_path, f'{name}.yaml')
-            if not path.exists(filename):
-                raise FileNotFoundError(f'profile: {name}')
-            profile = FakeResponseProfile.from_yaml(filename)
-            self.profiles[name] = profile
-        return profile
+         profile.find_endpoint('sms_send').find_step(12).choice()
+    """
+
+    def __init__(self, responses: List[FakeResponse] = None):
+        self.responses = responses or []
+
+    def __eq__(self, o):
+        return isinstance(o, list) and self.responses == o
+
+    def filter_by_endpoint(self, endpoint: str) -> 'FakeResponseCollection':
+        """
+            find all responses with endpoint
+        """
+        return FakeResponseCollection(
+            [resp for resp in self.responses if resp.endpoint == endpoint])
+
+    def filter_by_step(self, step: int) -> 'FakeResponseCollection':
+        """
+            find all responses with steps
+        """
+        # step %= (self.max_step+1)
+        return FakeResponseCollection(
+            [resp for resp in self.responses if resp.step == step])
+
+    @property
+    def max_step(self) -> int:
+        return max([resp.step for resp in self.responses], default=0)
+
+    def choice(self) -> Optional['FakeResponse']:
+        """
+            random choice one of responses depends of its chance
+        """
+        if self.responses:
+            cum_chance, chances = 0, list()
+            for response in self.responses:
+                cum_chance += response.chance
+                chances.append(cum_chance)
+            rnd_chance = randrange(0, cum_chance)
+            for chance, response in zip(chances, self.responses):
+                if chance > rnd_chance:
+                    return response
+        return None
+
+    def to_data(self):
+        return [asdict(resp) for resp in self.responses]
+
+    @classmethod
+    def from_list(cls, configs) -> 'FakeResponseCollection':
+        if not isinstance(configs, list):
+            raise ValueError('data is not list')
+        responses = list()
+        for config in configs:
+            response = FakeResponse.from_dict(config)
+            responses.append(response)
+        return cls(responses)
