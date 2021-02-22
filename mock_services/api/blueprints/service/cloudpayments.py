@@ -1,67 +1,48 @@
 # Generated from specs/cloudpayments.yaml
 from covador.flask import args
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify
+
+from mock_services.api.decorators import mockable
 
 cloudpayments = Blueprint("cloudpayments", __name__,
                           url_prefix='/service/cloudpayments')
 
 
-@cloudpayments.route('<profile>/payments/cards/auth',
+@cloudpayments.route('payments/cards/auth',
                      endpoint='payments_cards_auth', methods=['post'])
-@args(profile=str)
-def payments_cards_auth(profile, **kwargs):
-    response = current_app.get_fake_response(
-        profile=profile, endpoint=request.endpoint, **kwargs)
-    if response is not None:
-        return response
+@mockable
+def payments_cards_auth(**kwargs):
     result = {}
     return jsonify(result)
 
 
-@cloudpayments.route('<profile>/payments/void',
+@cloudpayments.route('payments/void',
                      endpoint='payments_void', methods=['post'])
-@args(profile=str)
-def payments_void(profile, **kwargs):
-    response = current_app.get_fake_response(
-        profile=profile, endpoint=request.endpoint, **kwargs)
-    if response is not None:
-        return response
+@mockable
+def payments_void(**kwargs):
     result = {}
     return jsonify(result)
 
 
-@cloudpayments.route('<profile>/payments/tokens/charge',
+@cloudpayments.route('payments/tokens/charge',
                      endpoint='payments_tokens_charge', methods=['post'])
-@args(profile=str)
-def payments_tokens_charge(profile, **kwargs):
-    response = current_app.get_fake_response(
-        profile=profile, endpoint=request.endpoint, **kwargs)
-    if response is not None:
-        return response
+@mockable
+def payments_tokens_charge(**kwargs):
     result = {}
     return jsonify(result)
 
 
-@cloudpayments.route('<profile>/payments/cards/post3ds',
+@cloudpayments.route('payments/cards/post3ds',
                      endpoint='payment_cards_post3ds', methods=['post'])
-@args(profile=str)
-def payment_cards_post3ds(profile, **kwargs):
-    response = current_app.get_fake_response(
-        profile=profile, endpoint=request.endpoint, **kwargs)
-    if response is not None:
-        return response
+@mockable
+def payment_cards_post3ds(**kwargs):
     result = {}
     return jsonify(result)
 
 
-@cloudpayments.route('<profile>/payments/find',
+@cloudpayments.route('payments/find',
                      endpoint='payments_find', methods=['post'])
-@args(profile=str)
-def payments_find(profile, **kwargs):
-    response = current_app.get_fake_response(
-        profile=profile, endpoint=request.endpoint, **kwargs)
-    if response is not None:
-        return response
+@mockable
+def payments_find(**kwargs):
     result = {}
     return jsonify(result)
-

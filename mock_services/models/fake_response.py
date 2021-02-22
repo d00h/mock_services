@@ -1,7 +1,10 @@
+import io
+import json
 from dataclasses import asdict, dataclass
 from random import randrange
 from typing import List, Optional
 
+import yaml
 from faker import Faker
 from flask import Response as FlaskResponse
 from jinja2 import Template
@@ -40,11 +43,11 @@ class FakeResponse(object):
     def __hash__(self):
         return hash(str(self))
 
-    def render(self, **kwargs) -> FlaskResponse:
-        if self.body_template and kwargs:
+    def render(self, *args, **kwargs) -> FlaskResponse:
+        if self.body_template:
             template = Template(self.body_template)
             template.globals.update(**TEMPLATE_FUNCS)
-            body = template.render(**kwargs)
+            body = template.render(*args, **kwargs)
         else:
             body = self.body_template
         return FlaskResponse(
@@ -62,6 +65,10 @@ class FakeResponse(object):
     @classmethod
     def timeout(cls, endpoint, **kwargs) -> 'FakeResponse':
         return cls(endpoint, status=GatewayTimeout.code, **kwargs)
+
+    @classmethod
+    def error(cls, endpoint, status, **kwargs) -> 'FakeResponse':
+        return cls(endpoint, status=status, **kwargs)
 
     @classmethod
     def from_dict(cls, config: dict) -> 'FakeResponse':
@@ -134,3 +141,24 @@ class FakeResponseCollection(object):
             else:
                 raise ValueError(f'Wrong type {type(config)}')
         return cls(responses)
+
+    @classmethod
+    def from_json(cls, buffer) -> 'FakeResponseCollection':
+        with io.BytesIO(buffer) as stream:
+            data = json.load(stream)
+        return cls.from_list(data)
+
+    @classmethod
+    def from_yaml(cls, buffer) -> 'FakeResponseCollection':
+        with io.BytesIO(buffer) as stream:
+            data = yaml.safe_load(stream)
+        return cls.from_list(data)
+
+    @classmethod
+    def try_parse(cls, buffer) -> 'FakeResponseCollection':
+        for parse in [cls.from_json, cls.from_yaml]:
+            try:
+                return parse(buffer)
+            except ValueError:
+                pass
+        return None

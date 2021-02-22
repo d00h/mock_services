@@ -1,22 +1,32 @@
 from covador.flask import args
 from flask import Blueprint, current_app, jsonify, request
 
-from mock_services.models import MockProfile
+from mock_services.models import MockProfile, FakeResponseCollection
 
 mock_profile = Blueprint("mock_profile", __name__,
                          url_prefix='/mock_profile')
 
 
 @mock_profile.route('', methods=['get'])
-def get_mock_profile(**kwargs):
+def get_profile(**kwargs):
     mock_profile: MockProfile = current_app.mock_profile
     data = mock_profile.config.to_data()
     return jsonify(data)
 
 
 @mock_profile.route('', methods=['post'])
-def post_mock_profile(**kwargs):
-    config_data = request.get_json(force=True)
+def set_profile(**kwargs):
+    data = request.get_data()
+    config_data = FakeResponseCollection.try_parse(data)
+    if config_data is None:
+        raise Exception(data)
     mock_profile: MockProfile = current_app.mock_profile
     mock_profile.config = config_data
+    return "ok"
+
+
+@mock_profile.route('', methods=['delete'])
+def delete_profile(**kwargs):
+    mock_profile: MockProfile = current_app.mock_profile
+    mock_profile.config = None
     return "ok"

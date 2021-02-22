@@ -2,10 +2,9 @@ import json
 from abc import ABC, abstractmethod
 from typing import Union
 
-from flask import Response as FlaskResponse
 from redis import Redis
 
-from .fake_response import FakeResponseCollection
+from .fake_response import FakeResponseCollection, FakeResponse
 
 
 class MockProfile(ABC):
@@ -25,7 +24,7 @@ class MockProfile(ABC):
         """ drop state of profile counts """
 
     @abstractmethod
-    def next_response(self, endpoint, **kwarg) -> FlaskResponse:
+    def next_response(self, endpoint) -> FakeResponse:
         pass
 
     @staticmethod
@@ -66,7 +65,7 @@ class RedisMockProfile(MockProfile):
         for key in self.redis.keys(count_key):
             self.redis.delete(key)
 
-    def next_response(self, endpoint, **kwarg) -> FlaskResponse:
+    def next_response(self, endpoint) -> FakeResponse:
         endpoint_responses = self.config.filter_by_endpoint(endpoint)
         max_step = endpoint_responses.max_step
 

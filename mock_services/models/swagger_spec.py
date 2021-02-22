@@ -22,14 +22,14 @@ class SwaggerSpec(object):
 
     def __init__(self, info: dict = None, consumes: list = None, produces: list = None,
                  schemas: list = None, paths: dict = None, tags: list = None,
-                 components_schemas: dict = None, **unused):
+                 components: dict = None, **unused):
         self.info = info or dict()
         self.consumes = consumes or ['application/json']
         self.produces = produces or ['application/json']
         self.schemes = schemas or ['http', 'https']
         self.paths = paths or dict()
         self.tags = tags or list()
-        self.components_schemas = components_schemas or dict()
+        self.components_schemas = components.get('schemas', {}) if components else {}
 
     def append_path_prefix(self, *word):
         """ add prefix to all paths"""
@@ -109,18 +109,9 @@ class SwaggerAggregator(object):
 
     def to_dict(self) -> dict:
         result = SwaggerSpec(info={'title': 'MockServices'})
-        result.append_spec(self.system['profile'])
-        profile_in_path = {
-            'in': 'path',
-            'name': 'profile',
-                    'type': 'string',
-                    'required': True,
-                    'default': 'default'
-        }
+        result.append_spec(self.system['mock_profile'])
         for name in self.service:
             external_service = self.service[name]
-            external_service.append_path_prefix('service', name)
-            external_service.append_parameter(profile_in_path)
-
+            external_service.append_path_prefix('/service', name)
             result.append_spec(external_service)
         return result.to_dict()

@@ -6,14 +6,14 @@ from urllib.parse import urlencode
 import requests
 
 parser = ArgumentParser()
-parser.add_argument(
-    "profile", help='default | easysms_123 | easysms_weak | easysms_limit')
 parser.add_argument("--host", action="store",
-                    nargs="?", default="http://127.0.0.1:5000")
-parser.add_argument("--count", action="store", default=3)
+                    nargs="?",
+                    default="http://127.0.0.1:5400",
+                    help="http://127.0.0.1:5400")
+parser.add_argument("--count", action="store", type=int)
 
 
-def process(url, profile, count):
+def process(url, count):
     q = {
         'login': 'username',
         'password': '12345',
@@ -21,7 +21,7 @@ def process(url, profile, count):
         'phone': '+7-905-999-99-99',
         'text': 'hello world'
     }
-    url = path.join(url, 'service/easysms', profile, '?'+urlencode(q))
+    url = path.join(url, 'service/easysms', '?'+urlencode(q))
     for _ in range(count):
         print(url)
         response = requests.get(url)
@@ -34,4 +34,4 @@ if __name__ == '__main__':
         parser.print_help()
     else:
         args = parser.parse_args()
-        process(args.host, args.profile, args.count)
+        process(args.host, args.count)

@@ -6,11 +6,9 @@ root = Blueprint('root', __name__)
 @root.route('/')
 def index():
     items = [
-        dict(
-            caption='ApiDocs', href='/apidocs'),
-        # dict(
-        #     caption='EasySMS: weak',
-        #     href=url_for('easysms.send_sms', profile='easysms_weak', **easysms_args)),
+        dict(caption='ApiDocs', href='/apidocs'),
+        dict(caption='Profile', href='/mock_profile'),
+        dict(caption='Logs', href='/mock_logger'),
     ]
     return render_template_string("""
     <html>

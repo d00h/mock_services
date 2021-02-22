@@ -2,14 +2,15 @@ from datetime import datetime
 
 from covador import opt, split
 from covador.flask import args, form
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify 
+
+from mock_services.api.decorators import mockable
 
 mailgun = Blueprint("mailgun", __name__,
                     url_prefix='/service/mailgun')
 
 
-@mailgun.route('/<profile>/messages', methods=['POST'])
-@args(profile=str)
+@mailgun.route('messages', methods=['POST'])
 @form(**{
     'from': str,
     'to': split(str),
@@ -18,11 +19,8 @@ mailgun = Blueprint("mailgun", __name__,
     'html': opt(str),
     'o:testmode': opt(str),
 })
-def messages(profile, **kwargs):
-    response = current_app.get_fake_response(
-        profile=profile, endpoint=request.endpoint, **kwargs)
-    if response is not None:
-        return response
+@mockable
+def messages(**kwargs):
     now = datetime.now()
     return jsonify(
         id='<{0:%Y%m%d%H%M%S}.{1}@mailgun.org>'.format(now, now.timestamp()),
@@ -30,14 +28,9 @@ def messages(profile, **kwargs):
     )
 
 
-@mailgun.route('/<profile>/stats/total', methods=['GET'])
-@args(profile=str)
-def stats(profile, **kwargs):
-    response = current_app.get_fake_response(
-        profile=profile, endpoint=request.endpoint, **kwargs)
-    if response is not None:
-        return response
-
+@mailgun.route('stats/total', methods=['GET'])
+@mockable
+def stats(**kwargs):
     return jsonify(
         {
             "end": "Fri, 01 Apr 2012 00:00:00 UTC",

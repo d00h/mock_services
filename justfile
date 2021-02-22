@@ -1,42 +1,25 @@
-all:
-    @echo nope
-
-tests *TEST:
-    echo test {{ TEST }}
+_all:
+    @just --list
 
 
-put-profile PROFILE SERVER='local':
-    python tools/mock-ctl.py put-profile {{ PROFILE }}
-
-
-
+set-profile FILENAME SERVER='http://127.0.0.1:5400':
+    curl -X POST  -o /dev/null --data-binary "@{{ FILENAME }}" "{{ SERVER }}/mock_profile"    
 
    
-# COMMIT_HASH := $(git rev-parse --short HEAD)
-# COMMIT_MESSAGE :=  $(git log -1 --pretty=%B)
-# DOCKER_COMPOSE = docker-compose
-# DOCKER_COMPOSE_DEVELOP = $(DOCKER_COMPOSE) --env-file .env
-# DOCKER_COMPOSE_TEST := $(DOCKER_COMPOSE) --env-file .env
+get-profile SERVER='http://127.0.0.1:5400':
+    curl -X GET "{{ SERVER }}/mock_profile"
 
-# ps:
+   
+delete-profile SERVER='http://127.0.0.1:5400':
+    curl -X delete "{{ SERVER }}/mock_profile"
 
-# 	@$(DOCKER_COMPOSE_DEVELOP) ps
+   
+get-logs SERVER='http://127.0.0.1:5400':
+    curl -X get "{{ SERVER }}/mock_logger"
+    
+delete-logs SERVER='http://127.0.0.1:5400':
+    curl -X delete "{{ SERVER }}/mock_logger"
 
-# up:
-# 	$(DOCKER_COMPOSE_DEVELOP) up --detach
+easysms COUNT='3':
+    python tools/example-easysms.py --count={{ COUNT }}
 
-# down:
-# 	@$(DOCKER_COMPOSE_DEVELOP) down
-
-# logs: up
-# 	@$(DOCKER_COMPOSE_DEVELOP) logs --follow
-
-# build:
-# 	$(DOCKER_COMPOSE) build
-
-# open:
-# 	xdg-open http://127.0.0.1:5400/
-
-# .PHONY: tests
-# tests:
-# 	@$(DOCKER_COMPOSE_TEST) run --rm api tests

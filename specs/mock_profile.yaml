@@ -9,22 +9,8 @@ tags:
       description: управление поведением сервиса
 
 paths:
-    /profile:
-        get:
-            tags: [profile]
-            operationId: profile.list_profiles
-            summary: получить список текущих профилей
-            responses:
-                200:
-                    description: OK
-                    schema:
-                        type: array
-                        items:
-                            type: string
-                        example: [easysms_weak, test123, dev1]
 
-
-    /profile/{profile}:
+    /mock_profile:
         get:
             tags: [profile]
             operationId: profile.get_profile
@@ -48,27 +34,8 @@ paths:
 
         delete:
             tags: [profile]
-            operationId: profile.set_profile
+            operationId: profile.delete_profile
             summary: удалить профиль из памяти сервера
-
-    /profile/{profile}/logs:
-
-        get:
-            tags: [profile]
-            operationId: profile.get_profile_logs
-            summary: очистить логи профиля
-            responses:
-                200:
-                    description: OK
-                    schema:
-                        type: array
-                        items:
-                            $ref: '#/components/schemas/ProfileLog'
-
-        delete:
-            tags: [profile]
-            operationId: profile.clear_profile_logs
-            summary: очистить логи профиля(скинуть состояние)
 
 components:
 
@@ -106,7 +73,7 @@ components:
                     summary: шанс ответа на текущем шаге
                     required: false
                     default: 100
-                    
+
         ProfileLog:
             type: object
             properties:
