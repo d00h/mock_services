@@ -4,11 +4,16 @@ from argparse import ArgumentParser
 from argparse import Namespace as ArgumentNamespace
 from os import path
 
+import requests
+import yaml
+
 SERVERS = {
     'local': 'http://127.0.0.1:5400',
     'dev': 'http://192.168.1.2:5000',
 }
 # --------------------------------------------------------
+
+
 class ConsoleWriter(ABC):
 
     @abstractmethod
@@ -34,10 +39,12 @@ class TableConsoleWriter(object):
         return item
 
     def write(self, *items):
-       print(' '.join([self._format(column, item)
-                           for column, item in enumerate(items)]))
+        print(' '.join([self._format(column, item)
+                        for column, item in enumerate(items)]))
 
 # --------------------------------------------------------
+
+
 class Command(ABC):
 
     @abstractclassmethod
@@ -46,7 +53,7 @@ class Command(ABC):
 
     def create_writer(self, args: ArgumentNamespace) -> ConsoleWriter:
         return TableConsoleWriter(columns=[8, 20])
-        
+
     @abstractmethod
     def run(self, args: ArgumentNamespace, out: ConsoleWriter):
         pass
@@ -89,10 +96,17 @@ class PutProfile(Command):
 
     @classmethod
     def configure_parser(cls, parser: ArgumentParser):
+        parser.add_argument("filename")
+        parser.add_argument("-o", "--output", default="local")
         parser.set_defaults(create_command=cls)
 
     def run(self,  args: ArgumentNamespace, out: ConsoleWriter):
         print("put_profile")
+        with open(args.filename) as stream:
+            data = yaml.safe_load(stream)
+        url = path.join(SERVERS[args.output], "mock_profile")
+        resp = requests.post(url, json=data)
+        print(url, resp.status_code)
 
 
 class GetProfile(Command):

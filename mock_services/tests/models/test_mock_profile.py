@@ -4,15 +4,15 @@ from faker import Faker
 from mock_services.models import FakeResponse, MockProfile
 
 
-class TestMockService(object):
+class TestMockProfile(object):
 
     fake: Faker
     mock_profile: MockProfile
 
     @pytest.fixture(autouse=True)
-    def setup(self, fake, mock_service):
+    def setup(self, fake, mock_profile):
         self.fake = fake
-        self.mock_service = mock_service
+        self.mock_profile = mock_profile
 
     @staticmethod
     def execute_request(profile, endpoint):
@@ -21,7 +21,7 @@ class TestMockService(object):
         return flask_response.get_data(as_text=True)
 
     def test_usage(self):
-        profile = self.mock_service.get_profile(self.fake.word())
+        profile = self.mock_profile        
         endpoint1, endpoint2 = self.fake.word(), self.fake.word()
         text1, text2 = self.fake.word(), self.fake.word()
         profile.config = [

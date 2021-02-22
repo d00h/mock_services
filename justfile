@@ -3,6 +3,15 @@ all:
 
 tests *TEST:
     echo test {{ TEST }}
+
+
+put-profile PROFILE SERVER='local':
+    python tools/mock-ctl.py put-profile {{ PROFILE }}
+
+
+
+
+   
 # COMMIT_HASH := $(git rev-parse --short HEAD)
 # COMMIT_MESSAGE :=  $(git log -1 --pretty=%B)
 # DOCKER_COMPOSE = docker-compose

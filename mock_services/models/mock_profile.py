@@ -1,6 +1,7 @@
+import json
 from abc import ABC, abstractmethod
 from typing import Union
-import json
+
 from flask import Response as FlaskResponse
 from redis import Redis
 
@@ -8,9 +9,6 @@ from .fake_response import FakeResponseCollection
 
 
 class MockProfile(ABC):
-
-    def __init__(self, name: str):
-        self.profile = name
 
     @property
     @abstractmethod
@@ -30,13 +28,16 @@ class MockProfile(ABC):
     def next_response(self, endpoint, **kwarg) -> FlaskResponse:
         pass
 
+    @staticmethod
+    def create(redis: Redis, expire) -> 'MockProfile':
+        return RedisMockProfile(redis, expire)
+
 
 class RedisMockProfile(MockProfile):
 
     redis: Redis
 
-    def __init__(self,  name: str, redis: Redis, expire=30*60):
-        MockProfile.__init__(self, name)
+    def __init__(self,  redis: Redis, expire=30*60):
         self.redis = redis
         self.expire = expire
 
@@ -52,8 +53,10 @@ class RedisMockProfile(MockProfile):
     @config.setter
     def config(self, responses: Union[FakeResponseCollection, list]):
         config_key = self._get_config_key()
-        if responses is None or isinstance(responses, list):
-            responses = FakeResponseCollection(responses)
+        if responses is None:
+            responses = FakeResponseCollection()
+        if isinstance(responses, list):
+            responses = FakeResponseCollection.from_list(responses)
         config_data = json.dumps(responses.to_data())
         self.redis.setex(config_key, self.expire, config_data)
         self.reset()
@@ -76,14 +79,7 @@ class RedisMockProfile(MockProfile):
         return endpoint_responses.filter_by_step(step).choice()
 
     def _get_config_key(self) -> str:
-        return f'{self.profile}/config'
+        return 'config'
 
     def _get_count_key(self, endpoint) -> str:
-        return f'{self.profile}/count/{endpoint}'
-
-
-# class MockService(ABC):
-
-#     @abstractmethod
-#     def __getitem__(self, profile_name) -> MockProfile:
-#         pass
+        return f'count/{endpoint}'

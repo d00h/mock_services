@@ -19,9 +19,9 @@ class MockService(object):
         return RedisMockLogger(profile_name, self.redis, self.expire)
 
     def find_profiles(self, prefix=None) -> Iterable[str]:
-        exists = set()
+        result = set()
         pattern = '{0}*'.format(prefix or '')
         for key in self.redis.keys(pattern):
-            name = key.split('/', maxspit=1)[0]
-            if exists.add(name):
-                yield name
+            name, _ = key.decode().split('/', maxsplit=1)
+            result.add(name)
+        return list(result)

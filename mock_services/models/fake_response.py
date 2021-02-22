@@ -127,6 +127,10 @@ class FakeResponseCollection(object):
             raise ValueError('data is not list')
         responses = list()
         for config in configs:
-            response = FakeResponse.from_dict(config)
-            responses.append(response)
+            if isinstance(config, FakeResponse):
+                responses.append(config)
+            elif isinstance(config, dict):
+                responses.append(FakeResponse.from_dict(config))
+            else:
+                raise ValueError(f'Wrong type {type(config)}')
         return cls(responses)
