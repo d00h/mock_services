@@ -68,6 +68,6 @@ def create_app() -> MockServicesApp:
     app.register_blueprint(mailgun)
     app.register_blueprint(cloudpayments)
 
-    app.register_error_handler(404, page_not_found) 
+    app.register_error_handler(404, page_not_found)
 
     return LocalProxy(lambda: app)

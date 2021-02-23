@@ -14,7 +14,7 @@ def get_logs(**kwargs):
 
 
 @mock_logger.route('', methods=['delete'])
-def cleat_logs(**kwargs):
+def clear_logs(**kwargs):
     mock_logger: MockLogger = current_app.mock_logger
     mock_logger.clear()
     return "ok"

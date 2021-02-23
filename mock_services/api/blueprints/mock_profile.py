@@ -1,7 +1,6 @@
-from covador.flask import args
 from flask import Blueprint, current_app, jsonify, request
 
-from mock_services.models import MockProfile, FakeResponseCollection
+from mock_services.models import FakeResponseCollection, MockProfile
 
 mock_profile = Blueprint("mock_profile", __name__,
                          url_prefix='/mock_profile')

@@ -1,0 +1,51 @@
+---
+swagger: "2.0"
+info: {"title": "Profile"}
+produces: ["application/json"]
+consumes: ["application/json"]
+scheme: ["http", "https"]
+tags:
+    - name: profile
+      description: управление поведением сервиса
+
+paths:
+
+    /mock_logger:
+        get:
+            tags: [profile]
+            operationId: mock_logger.get_logs
+            summary: получить логи сервера
+            responses:
+                200:
+                    description: OK
+                    schema:
+                        $ref: '#/components/schemas/ProfileConfig'
+
+        delete:
+            tags: [profile]
+            operationId: mock_logger.clear_logs
+            summary: очистить логи
+            responses:
+                200:
+                    description: OK
+
+components:
+
+    schemas:
+
+        ProfileEndpoint:
+            type: string
+            example: easysms.send_sms
+
+        ProfileLog:
+            type: object
+            properties:
+                time:
+                    type: string
+                    format: date-time
+                endpoint:
+                    $ref: '#/components/schemas/ProfileEndpoint'
+                request:
+                    type: object
+                response:
+                    type: object

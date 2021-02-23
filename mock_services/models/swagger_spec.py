@@ -110,6 +110,7 @@ class SwaggerAggregator(object):
     def to_dict(self) -> dict:
         result = SwaggerSpec(info={'title': 'MockServices'})
         result.append_spec(self.system['mock_profile'])
+        result.append_spec(self.system['mock_logger'])
         for name in self.service:
             external_service = self.service[name]
             external_service.append_path_prefix('/service', name)

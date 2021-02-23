@@ -20,6 +20,7 @@ paths:
                     description: OK
                     schema:
                         $ref: '#/components/schemas/ProfileConfig'
+
         post:
             tags: [profile]
             operationId: profile.set_profile
@@ -36,6 +37,9 @@ paths:
             tags: [profile]
             operationId: profile.delete_profile
             summary: удалить профиль из памяти сервера
+            responses:
+                200:
+                    description: OK
 
 components:
 
@@ -73,19 +77,6 @@ components:
                     summary: шанс ответа на текущем шаге
                     required: false
                     default: 100
-
-        ProfileLog:
-            type: object
-            properties:
-                start_time:
-                    type: string
-                    format: date-time
-                endpoint:
-                    $ref: '#/components/schemas/ProfileEndpoint'
-                request:
-                    type: object
-                response:
-                    type: object
 
         ProfileConfig:
             type: array
