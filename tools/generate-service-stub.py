@@ -1,19 +1,16 @@
 """# Generated from {{ filename }}
-from covador.flask import args
 from flask import Blueprint, current_app, jsonify, request
+
+from mock_services.api.decorators import mockable
 
 {{ service }} = Blueprint("{{ service }}", __name__,
                           url_prefix='/service/{{ service }}')
 {% for route in paths %}
 
-@{{ service }}.route('<profile>/{{ route.path }}',
+@{{ service }}.route('{{ route.path }}',
                      endpoint='{{ route.endpoint }}', methods=['{{ route.method }}'])
-@args(profile=str)
-def {{ route.endpoint }}(profile, **kwargs):
-    response = current_app.get_fake_response(
-        profile=profile, endpoint=request.endpoint, **kwargs)
-    if response is not None:
-        return response
+@mockable
+def {{ route.endpoint }}(**kwargs):
     result = {}
     return jsonify(result)
 {% endfor %}

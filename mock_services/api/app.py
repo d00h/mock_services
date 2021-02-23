@@ -22,7 +22,7 @@ class MockServicesApp(Flask):
     mock_logger: MockLogger
 
     def __init__(self):
-        Flask.__init__(self, __name__, static_folder='static')
+        Flask.__init__(self, __name__, static_folder='./static')
 
     def init_logger(self):
         self.logger.removeHandler(default_handler)

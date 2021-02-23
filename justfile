@@ -15,9 +15,12 @@ logs SERVER='http://127.0.0.1:5400':
 
 # delete profile and logs
 clean SERVER='http://127.0.0.1:5400':
-    curl -X delete "{{ SERVER }}/mock_logger"
-    curl -X delete "{{ SERVER }}/mock_profile"
-
+    curl -X delete "{{ SERVER }}/mock_logger"; echo
+    curl -X delete "{{ SERVER }}/mock_profile"; echo
+    
+# generate stub from swagger
+generate SPEC:
+    python tools/generate-service-stub.py {{ SPEC }}
 
 run-easysms COUNT='3':
     python tools/example-easysms.py --count={{ COUNT }}

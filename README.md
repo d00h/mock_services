@@ -27,20 +27,26 @@ make build up
 
 ```
 
-открыть в браузере http://127.0.0.1:5000
+открыть в браузере http://127.0.0.1:5400
 
 посмотреть, как пример того, как сервис работает можно запустив:
 
 ```shell
 
-python tools/example-easysms.py default
-python tools/example-easysms.py easysms_limit
-python tools/example-easysms.py easysms_weak
-python tools/example-easysms.py easysms_123
+# посылаем на 127.0.0.1:5400/mock_profile настройки профиля
+python tools/mock-ctl.py put-profile profiles/easysms_123.yaml 
+
+# эмитируем работу с внешним сервисом
+python tools/example-easysms.py
 
 ```
 
 где default, easysms_limit, easysms_weak, easysms_123 это профили из папки profiles
+
+# Примеры
+
+в justfile описанны примеры использования:
+
 
 # Использование 
 
@@ -50,7 +56,7 @@ python tools/example-easysms.py easysms_123
 
 ```python
 
-EASYSMS_URL=http://mock_services.develop/service/easysms/профиль
+EASYSMS_URL=http://mock_services.develop/service/easysms
 
 ```
 
@@ -64,8 +70,9 @@ EASYSMS_URL=http://mock_services.develop/service/easysms/профиль
 # Cтруктура api сервиса
 
 * /apidocs документация внешних сервисов и тестер 
-* /service/easysms/профиль/ точка для замены сервиса
-* /profile/профиль управления профилями (планируется)
+* /service/easysms точка для замены сервиса
+* /mock_profile управления профилями
+* /mock_logger получения логов мокированых запросов
 
 # Профиль
 
@@ -133,23 +140,6 @@ python tools/generate-service-stub.py spec/easysms.yaml
 
 # точки расширения
 
-1. сделать /profile/профиль
-
-get: получить профиль
-
-put: записать новый профиль
-
-delete: удалить
-
-нужно для создания временных профилей и чтобы можно было бы асинхронно использовать один сервер в многопоточной среде
-
-2. сделать /logs/профиль
-
-get: получить список вызовов endpoint 
-по сути сниффер, можно например использовать для отладки или создания первичного профиля взаимодействия
-
-delete: очистить состояния профиля. Например, скинуть счетчики
-
-3. сделать генератор профиля из HAR архива.
+1. сделать генератор профиля из HAR архива.
 
 для разбора прецедентов

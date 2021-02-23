@@ -1,5 +1,4 @@
 # Generated from specs/cloudpayments.yaml
-from covador.flask import args
 from flask import Blueprint, jsonify
 
 from mock_services.api.decorators import mockable

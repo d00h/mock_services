@@ -20,6 +20,9 @@ build: export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
 build:
 	$(DOCKER_COMPOSE) build
 
+shell: up
+	@$(DOCKER_COMPOSE) exec api bash
+
 open:
 	xdg-open http://127.0.0.1:5400/
 
